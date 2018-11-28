@@ -38,6 +38,7 @@ public class Queue {
       yarr[top] = tmp.y;
       sarr[top] = 50; // Dot size
   }
+}
  
   public void pop() {
     if (top >= rear) {
