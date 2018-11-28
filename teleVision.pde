@@ -7,7 +7,7 @@ MercatorMap mercatorMap;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 
-int bufferSize = 100;
+int bufferSize = 10000;
 
 int varName;
 
@@ -38,6 +38,13 @@ public class Queue {
       yarr[top] = tmp.y;
       sarr[top] = 50; // Dot size
   }
+  else
+  {
+      top = -1;
+      rear = 0;
+    
+      println("out of space");
+  }
 }
  
   public void pop() {
@@ -52,7 +59,9 @@ public class Queue {
       for (int i = rear; i <= top; i++) {
         //print(arr[i]);
         ellipse(xarr[i], yarr[i], sarr[i], sarr[i]);
-        sarr[i] = sarr[i] - 0.1;
+        if (sarr[i] > 0){
+          sarr[i] = sarr[i] - 0.5;
+        }
       }
     for (int i = rear; i <= top; i++) {
       if (sarr[i] <= 0){
