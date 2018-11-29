@@ -13,9 +13,12 @@ int varName;
 
 float x;
 float y;
+int c;
 
 boolean pushx = false;
 boolean pushy = false;
+boolean pushc = false;
+
 
 Queue queue = new Queue();
 
@@ -25,18 +28,20 @@ public class Queue {
   float xarr[] = new float[capacity];
   float yarr[] = new float[capacity];
   float sarr[] = new float[capacity];
+  int carr[] = new int[capacity];
   
   int top = -1;
   int rear = 0;
  
-  public void push(float x, float y) {
+  public void push(float x, float y, int c) {
     if (top < capacity - 1) {
       top++;
       PVector input = new PVector(x, y);
       PVector tmp = mercatorMap.getScreenLocation(input);
       xarr[top] = tmp.x;
       yarr[top] = tmp.y;
-      sarr[top] = 50; // Dot size
+      carr[top] = c;
+      sarr[top] = 60; // Dot size
   }
   else
   {
@@ -58,7 +63,22 @@ public class Queue {
     if (top >= rear) {
       for (int i = rear; i <= top; i++) {
         //print(arr[i]);
+        colorMode(HSB, 1000);
+        if (carr[i] <= 1024){
+          c = int(map(carr[i], 0, 1024, 0, 1000));
+          fill(c, 1000, 1000);
+        }
+        else
+        {
+          fill(c, 0, 1000);
+        }
         ellipse(xarr[i], yarr[i], sarr[i], sarr[i]);
+        colorMode(RGB, 100);
+        fill(0,0,0);
+        String s =  str(carr[i]);
+        float cw = textWidth(s);
+        textSize(sarr[i]/4);
+        text(s, xarr[i]-(cw/2), yarr[i]+((sarr[i]/4)/2)) ;
         if (sarr[i] > 0){
           sarr[i] = sarr[i] - 0.5;
         }
@@ -75,6 +95,8 @@ public class Queue {
 void setup() {
   size(1382, 1070);
   smooth();
+  
+  colorMode(HSB, 100);
   
   // World map from http://en.wikipedia.org/wiki/File:Mercator-projection.jpg 
   worldMapImage = loadImage("Mercator_projection_smaller.jpg");
@@ -103,9 +125,15 @@ void oscEvent(OscMessage theOscMessage) {
     y = theOscMessage.get(0).floatValue();   
     pushy = true;
   }
-  if ((pushx == true) && (pushy == true))
+  if (theOscMessage.checkAddrPattern("/freq")==true)
   {
-    queue.push(x, y);
+    c = theOscMessage.get(0).intValue();
+    pushc = true;
+  }
+  if ((pushx == true) && (pushy == true) && (pushc == true))
+  {
+    queue.push(x, y, c);
+    pushc = false;
     pushx = false;
     pushy = false;
   }
